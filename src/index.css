@@ -1,0 +1,165 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Arial sized to Inter's metrics, so text doesn't reflow when Inter swaps in. */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 107.12%;
+  ascent-override: 90.44%;
+  descent-override: 22.52%;
+  line-gap-override: 0%;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-padding-top: 80px; /* clears the sticky nav on anchor jumps */
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    @apply bg-white font-sans text-onyx antialiased;
+    font-size: 16px;
+    line-height: 1.6;
+    overflow-x: clip;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    text-wrap: balance;
+  }
+
+  /* Motion-blue focus ring everywhere. */
+  :focus-visible {
+    outline: 2px solid #2c62c9;
+    outline-offset: 3px;
+  }
+
+  /* On navy, motion blue alone is under 3:1, so pair it with a white inner ring. */
+  .on-dark :focus-visible {
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px #fff;
+  }
+}
+
+@layer components {
+  .container-x {
+    width: min(1120px, 100% - 2 * clamp(16px, 4vw, 40px));
+    margin-inline: auto;
+  }
+
+  /* The technical layer: eyebrows, case IDs, stack tags, step numbers. Labels only. */
+  .mono-label {
+    @apply font-mono uppercase;
+    font-size: 12px;
+    line-height: 1.4;
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  .skip-link {
+    @apply fixed left-4 top-3 z-[100] -translate-y-24 rounded-full bg-white px-4 py-2 text-sm font-semibold text-navy;
+  }
+  .skip-link:focus {
+    @apply translate-y-0;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full font-semibold transition-colors duration-150;
+    min-height: 44px;
+    padding-inline: 20px;
+    font-size: 15px;
+  }
+  .btn-light {
+    @apply bg-white text-navy hover:bg-mist;
+  }
+  .btn-ghost {
+    @apply border border-white/40 text-white hover:border-white hover:bg-white/10;
+  }
+}
+
+/* ---------- Hero ---------- */
+
+/* Blueprint grid: 1px lines at about 4% opacity, fading out toward the bottom. */
+.blueprint {
+  background-image:
+    linear-gradient(to right, rgb(255 255 255 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgb(255 255 255 / 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+  background-position: -1px -1px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent);
+  mask-image: linear-gradient(to bottom, #000 55%, transparent);
+}
+
+@keyframes mark-drift {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-3%);
+  }
+}
+.hero-mark {
+  animation: mark-drift 24s ease-in-out infinite alternate;
+}
+
+/* Workflow strip. One 10s loop: the dot travels Record to Report in 7.5s,
+   reaching a node every 2.5s, then fades and restarts. */
+@keyframes flow-travel {
+  0% {
+    transform: translateX(0);
+    opacity: 0;
+  }
+  4% {
+    opacity: 1;
+  }
+  75% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+  84%,
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+/* Opacity and transform only, so the loop stays on the compositor. */
+@keyframes flow-node {
+  0% {
+    opacity: 1;
+  }
+  14%,
+  100% {
+    opacity: 0;
+  }
+}
+.flow-track,
+.hero-mark {
+  will-change: transform;
+}
+.flow-track {
+  animation: flow-travel 10s linear infinite;
+}
+.flow-ring {
+  opacity: 0;
+  animation: flow-node 10s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-mark,
+  .flow-ring {
+    animation: none;
+  }
+  .flow-track {
+    display: none;
+  }
+}
